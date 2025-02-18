@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exemplos de OOP no Mundo Real</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      background-color: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: #333;
+      margin-top: 20px;
+    }
+
+    h1 {
+      text-align: center; 
+      color: rgb(36, 60, 194);
+      padding: 20px;
+    }
+
+    h2 {
+      color: rgb(36, 60, 194);
+    }
+
+    h3 {
+      color: #555;
+    }
+
+    p {
+      font-size: 16px;
+      margin: 15px 0;
+      padding: 0 20px;
+    }
+
+    code {
+      background-color: #f1f1f1;
+      padding: 2px 5px;
+      border-radius: 3px;
+    }
+
+    pre {
+      background-color: #2d2d2d;
+      color: white;
+      padding: 20px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+
+    pre code {
+      background-color: transparent;
+      color: #f1f1f1;
+    }
+
+    ul {
+      margin-left: 20px;
+    }
+
+    ul li {
+      margin-bottom: 8px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Exemplos de Implementação de OOP no Mundo Real</h1>
+
+    <h2>1. Sistema Bancário</h2>
+    <p>No contexto de um sistema bancário, podemos modelar contas bancárias e clientes como objetos. Cada conta tem um
+      saldo e operações como depósito e saque.</p>
+    <pre><code>
+class ContaBancaria {
+    private $saldo;
+    private $titular;
+    
+    public function __construct($titular) {
+        $this->titular = $titular;
+        $this->saldo = 0;
+    }
+    
+    public function depositar($valor) {
+        $this->saldo += $valor;
+    }
+    
+    public function sacar($valor) {
+        if ($valor <= $this->saldo) {
+            $this->saldo -= $valor;
+        } else {
+            echo "Saldo insuficiente!";
+        }
+    }
+    
+    public function getSaldo() {
+        return $this->saldo;
+    }
+}
+
+class Cliente {
+    private $nome;
+    private $conta;
+    
+    public function __construct($nome) {
+        $this->nome = $nome;
+        $this->conta = new ContaBancaria($this->nome);
+    }
+    
+    public function getConta() {
+        return $this->conta;
+    }
+}
+
+$cliente1 = new Cliente("João");
+$cliente1->getConta()->depositar(500);
+echo $cliente1->getConta()->getSaldo();  // 500
+$cliente1->getConta()->sacar(100);
+echo $cliente1->getConta()->getSaldo();  // 400
+        </code></pre>
+
+    <h2>2. Sistema de Pedidos em um Restaurante</h2>
+    <p>Em um restaurante, podemos modelar itens de menu e pedidos como objetos, com cada item representando um prato ou
+      bebida.</p>
+    <pre><code>
+class Item {
+    private $nome;
+    private $preco;
+    
+    public function __construct($nome, $preco) {
+        $this->nome = $nome;
+        $this->preco = $preco;
+    }
+    
+    public function getPreco() {
+        return $this->preco;
+    }
+    
+    public function getNome() {
+        return $this->nome;
+    }
+}
+
+class Pedido {
+    private $itens = [];
+    
+    public function adicionarItem(Item $item) {
+        $this->itens[] = $item;
+    }
+    
+    public function calcularTotal() {
+        $total = 0;
+        foreach ($this->itens as $item) {
+            $total += $item->getPreco();
+        }
+        return $total;
+    }
+}
+
+$item1 = new Item("Hamburguer", 15.00);
+$item2 = new Item("Refrigerante", 5.00);
+
+$pedido = new Pedido();
+$pedido->adicionarItem($item1);
+$pedido->adicionarItem($item2);
+
+echo "Total do pedido: " . $pedido->calcularTotal();  // 20.00
+        </code></pre>
+
+    <h2>3. Sistema de Veículos</h2>
+    <p>Em um sistema de transporte ou frota de veículos, podemos modelar veículos como objetos, com diferentes tipos,
+      como carros, caminhões e motos.</p>
+    <pre><code>
+class Veiculo {
+    protected $modelo;
+    protected $cor;
+    
+    public function __construct($modelo, $cor) {
+        $this->modelo = $modelo;
+        $this->cor = $cor;
+    }
+    
+    public function info() {
+        echo "Modelo: {$this->modelo}, Cor: {$this->cor}\n";
+    }
+}
+
+class Carro extends Veiculo {
+    private $tipoDeCombustivel;
+    
+    public function __construct($modelo, $cor, $tipoDeCombustivel) {
+        parent::__construct($modelo, $cor);
+        $this->tipoDeCombustivel = $tipoDeCombustivel;
+    }
+    
+    public function info() {
+        parent::info();
+        echo "Combustível: {$this->tipoDeCombustivel}\n";
+    }
+}
+
+$carro1 = new Carro("Fusca", "Azul", "Gasolina");
+$carro1->info();  // Modelo: Fusca, Cor: Azul, Combustível: Gasolina
+        </code></pre>
+
+    <h2>4. Sistema de E-commerce</h2>
+    <p>No contexto de um e-commerce, podemos ter produtos, carrinhos de compras e clientes representados como objetos,
+      facilitando a adição de produtos e cálculo do total de compras.</p>
+    <pre><code>
+class Produto {
+    private $nome;
+    private $preco;
+    
+    public function __construct($nome, $preco) {
+        $this->nome = $nome;
+        $this->preco = $preco;
+    }
+    
+    public function getNome() {
+        return $this->nome;
+    }
+    
+    public function getPreco() {
+        return $this->preco;
+    }
+}
+
+class Carrinho {
+    private $produtos = [];
+    
+    public function adicionarProduto(Produto $produto) {
+        $this->produtos[] = $produto;
+    }
+    
+    public function calcularTotal() {
+        $total = 0;
+        foreach ($this->produtos as $produto) {
+            $total += $produto->getPreco();
+        }
+        return $total;
+    }
+}
+
+$produto1 = new Produto("Camiseta", 50);
+$produto2 = new Produto("Calça Jeans", 120);
+
+$carrinho = new Carrinho();
+$carrinho->adicionarProduto($produto1);
+$carrinho->adicionarProduto($produto2);
+
+echo "Total do carrinho: " . $carrinho->calcularTotal();  // 170
+        </code></pre>
+
+    <h2>5. Sistema de Controle de Estoque</h2>
+    <p>Em um sistema de controle de estoque, podemos modelar produtos e sua quantidade em estoque como objetos,
+      permitindo operações de entrada e saída de produtos.</p>
+    <pre><code>
+class ProdutoEstoque {
+    private $nome;
+    private $quantidade;
+    
+    public function __construct($nome, $quantidade) {
+        $this->nome = $nome;
+        $this->quantidade = $quantidade;
+    }
+    
+    public function adicionarEstoque($quantidade) {
+        $this->quantidade += $quantidade;
+    }
+    
+    public function retirarEstoque($quantidade) {
+        if ($this->quantidade >= $quantidade) {
+            $this->quantidade -= $quantidade;
+        } else {
+            echo "Estoque insuficiente!";
+        }
+    }
+    
+    public function getQuantidade() {
+        return $this->quantidade;
+    }
+}
+
+$produto = new ProdutoEstoque("Cadeira", 50);
+$produto->adicionarEstoque(30);
+$produto->retirarEstoque(40);
+echo "Estoque atual: " . $produto->getQuantidade();  // 40
+        </code></pre>
+  </div>
+</body>
+
+</html>

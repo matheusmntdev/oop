@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orientação a Objetos com PHP</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #333;
+            margin-top: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #4CAF50;
+        }
+
+        h3 {
+            color: #555;
+        }
+
+        p {
+            font-size: 16px;
+            margin: 15px 0;
+            padding: 0 20px;
+        }
+
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        pre {
+            background-color: #2d2d2d;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: #f1f1f1;
+        }
+
+        ul {
+            margin-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Orientação a Objetos com PHP</h1>
+        <p>A <strong>Orientação a Objetos (OO)</strong> é um paradigma de programação que organiza o código em
+            "objetos". Um objeto é uma instância de uma <strong>classe</strong>, que pode conter
+            <strong>atributos</strong> e <strong>métodos</strong>. O PHP suporta a programação orientada a objetos desde
+            sua versão 5. Vamos entender como usar esses conceitos em PHP de forma prática.</p>
+
+        <h2>1. Conceitos Fundamentais</h2>
+
+        <h3>1.1 Classe</h3>
+        <p>Uma <strong>classe</strong> é o molde ou estrutura que define um tipo de objeto. Ela contém atributos (também
+            chamados de propriedades) e métodos (também chamados de funções).</p>
+        <pre><code>
+class Carro {
+    public $modelo;
+    public $cor;
+    
+    public function ligar() {
+        echo "O carro está ligado!";
+    }
+}
+        </code></pre>
+
+        <h3>1.2 Objeto</h3>
+        <p>Um <strong>objeto</strong> é uma instância de uma classe. Para criar um objeto, usamos a palavra-chave
+            <code>new</code>.</p>
+        <pre><code>
+$meuCarro = new Carro();
+$meuCarro->modelo = "Fusca";
+$meuCarro->cor = "Azul";
+$meuCarro->ligar();
+        </code></pre>
+
+        <h3>1.3 Atributos (Propriedades)</h3>
+        <p>Atributos são as variáveis associadas a um objeto. Eles podem ter diferentes níveis de acesso:</p>
+        <ul>
+            <li><code>public</code>: Atributo acessível de qualquer lugar.</li>
+            <li><code>protected</code>: Atributo acessível dentro da classe e suas subclasses.</li>
+            <li><code>private</code>: Atributo acessível apenas dentro da classe.</li>
+        </ul>
+
+        <h3>1.4 Métodos</h3>
+        <p>Métodos são funções que pertencem a uma classe. Eles podem ser chamados por um objeto e podem modificar os
+            atributos desse objeto.</p>
+        <pre><code>
+class Pessoa {
+    public $nome;
+    
+    public function dizerOla() {
+        echo "Olá, " . $this->nome;
+    }
+}
+
+$pessoa = new Pessoa();
+$pessoa->nome = "João";
+$pessoa->dizerOla();
+        </code></pre>
+
+        <h2>2. Encapsulamento</h2>
+        <p>O <strong>encapsulamento</strong> é um dos pilares da programação orientada a objetos. Ele diz respeito à
+            forma como os dados são protegidos e acessados. Podemos controlar o acesso aos atributos de uma classe
+            utilizando métodos especiais como <strong>getters</strong> e <strong>setters</strong>.</p>
+        <pre><code>
+class Produto {
+    private $preco;
+    
+    public function setPreco($preco) {
+        $this->preco = $preco;
+    }
+    
+    public function getPreco() {
+        return $this->preco;
+    }
+}
+
+$produto = new Produto();
+$produto->setPreco(100);
+echo $produto->getPreco();
+        </code></pre>
+
+        <h2>3. Herança</h2>
+        <p><strong>Herança</strong> permite que uma classe herde propriedades e métodos de outra. Isso facilita a
+            reutilização de código e cria uma hierarquia entre as classes.</p>
+        <pre><code>
+class Animal {
+    public $nome;
+    
+    public function fazerSom() {
+        echo "Som do animal";
+    }
+}
+
+class Cachorro extends Animal {
+    public function fazerSom() {
+        echo "Au Au!";
+    }
+}
+
+$cachorro = new Cachorro();
+$cachorro->fazerSom();  // Saída: Au Au!
+        </code></pre>
+
+        <h2>4. Polimorfismo</h2>
+        <p>O <strong>polimorfismo</strong> permite que um objeto de uma classe derivada seja tratado como se fosse da
+            classe base. Ele pode alterar o comportamento de um método da classe base.</p>
+        <pre><code>
+class Veiculo {
+    public function andar() {
+        echo "O veículo está andando!";
+    }
+}
+
+class Carro extends Veiculo {
+    public function andar() {
+        echo "O carro está andando!";
+    }
+}
+
+$veiculo = new Veiculo();
+$carro = new Carro();
+
+$veiculo->andar();  // Saída: O veículo está andando!
+$carro->andar();    // Saída: O carro está andando!
+        </code></pre>
+
+        <h2>5. Abstração</h2>
+        <p>A <strong>abstração</strong> permite esconder os detalhes da implementação e mostrar apenas o que é
+            necessário. Usamos classes <strong>abstratas</strong> e <strong>interfaces</strong> para definir
+            comportamentos comuns, mas sem implementação detalhada.</p>
+
+        <h3>5.1 Classe Abstrata</h3>
+        <p>Uma classe abstrata não pode ser instanciada diretamente e pode ter métodos abstratos que devem ser
+            implementados pelas classes filhas.</p>
+        <pre><code>
+abstract class Forma {
+    abstract public function calcularArea();
+}
+
+class Quadrado extends Forma {
+    private $lado;
+    
+    public function __construct($lado) {
+        $this->lado = $lado;
+    }
+    
+    public function calcularArea() {
+        return $this->lado * $this->lado;
+    }
+}
+
+$quadrado = new Quadrado(5);
+echo $quadrado->calcularArea();  // Saída: 25
+        </code></pre>
+
+        <h3>5.2 Interface</h3>
+        <p>Uma <strong>interface</strong> define um contrato que deve ser seguido pelas classes que a implementam,
+            garantindo que certos métodos sejam implementados.</p>
+        <pre><code>
+interface Pagamento {
+    public function pagar();
+}
+
+class Cartao implements Pagamento {
+    public function pagar() {
+        echo "Pagamento realizado com cartão.";
+    }
+}
+
+$pagamento = new Cartao();
+$pagamento->pagar();  // Saída: Pagamento realizado com cartão.
+        </code></pre>
+
+        <h2>6. Construtores e Destrutores</h2>
+        <p>O <strong>construtor</strong> é um método especial chamado automaticamente quando um objeto é instanciado. O
+            <strong>destruidor</strong> é chamado quando o objeto é destruído.</p>
+        <pre><code>
+class Livro {
+    public $titulo;
+    
+    public function __construct($titulo) {
+        $this->titulo = $titulo;
+    }
+    
+    public function __destruct() {
+        echo "O livro " . $this->titulo . " foi destruído.";
+    }
+}
+
+$livro = new Livro("PHP para Iniciantes");
+// Saída: O livro PHP para Iniciantes foi destruído (quando o objeto sair de escopo).
+        </code></pre>
+
+        <h2>7. Traits</h2>
+        <p><strong>Traits</strong> são um mecanismo para reutilizar código em múltiplas classes. Eles não podem ser
+            instanciados, mas podem ser incluídos em várias classes.</p>
+        <pre><code>
+trait Log {
+    public function logar($mensagem) {
+        echo "Log: " . $mensagem;
+    }
+}
+
+class Usuario {
+    use Log;
+}
+
+$usuario = new Usuario();
+$usuario->logar("Usuário logado.");
+        </code></pre>
+    </div>
+</body>
+
+</html>
