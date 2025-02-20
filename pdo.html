@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDO em PHP Orientado a Objetos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        p, li {
+            color: #555;
+        }
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDO em PHP Orientado a Objetos</h1>
+
+        <h2>O que é PDO em PHP?</h2>
+        <p>PDO é uma extensão do PHP que fornece uma interface leve e consistente para acesso a bancos de dados. Ele é orientado a objetos e suporta diversos tipos de bancos de dados (MySQL, PostgreSQL, SQLite, Oracle, etc.) usando os mesmos métodos, o que torna o código mais portável e reutilizável.</p>
+        <p>Diferente de extensões como <code>mysqli</code> ou a antiga <code>mysql</code>, o PDO oferece uma camada de abstração que facilita a troca de banco de dados sem grandes mudanças no código, além de suporte nativo a consultas preparadas (prepared statements), que ajudam a prevenir injeções SQL.</p>
+
+        <h2>Vantagens do PDO</h2>
+        <ul>
+            <li><strong>Portabilidade:</strong> Funciona com vários bancos de dados usando a mesma API.</li>
+            <li><strong>Segurança:</strong> Suporte a prepared statements para evitar SQL Injection.</li>
+            <li><strong>Flexibilidade:</strong> Pode lidar com diferentes tipos de consultas e retornos (arrays associativos, objetos, etc.).</li>
+            <li><strong>Tratamento de erros:</strong> Oferece modos de exceção para capturar erros de forma robusta.</li>
+            <li><strong>Orientação a objetos:</strong> Métodos e propriedades bem estruturados.</li>
+        </ul>
+
+        <h2>Exemplo Básico de Conexão com PDO</h2>
+        <p>Vamos começar com um exemplo simples de conexão com o banco de dados usando PDO em uma classe orientada a objetos:</p>
+        <pre><code>&lt;?php
+class Database {
+    private $host = "localhost";
+    private $dbname = "meu_banco";
+    private $username = "root";
+    private $password = "";
+    private $pdo;
+
+    // Método para estabelecer a conexão
+    public function connect() {
+        try {
+            $this->pdo = new PDO(
+                "mysql:host={$this->host};dbname={$this->dbname}",
+                $this->username,
+                $this->password
+            );
+            // Configurar PDO para lançar exceções em caso de erro
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            echo "Conexão realizada com sucesso!";
+        } catch (PDOException $e) {
+            echo "Erro na conexão: " . $e->getMessage();
+        }
+        return $this->pdo;
+    }
+}
+
+// Uso da classe
+$db = new Database();
+$pdo = $db->connect();
+?&gt;</code></pre>
+        <p>Nesse exemplo:</p>
+        <ul>
+            <li>Criamos uma classe <code>Database</code> com propriedades privadas para as credenciais.</li>
+            <li>O método <code>connect()</code> instancia um objeto PDO e retorna a conexão.</li>
+            <li>Usamos um bloco <code>try-catch</code> para capturar exceções em caso de falha na conexão.</li>
+        </ul>
+
+        <h2>Consultas com PDO (CRUD)</h2>
+        <p>Agora, vamos expandir a classe <code>Database</code> para incluir operações básicas de CRUD (Create, Read, Update, Delete).</p>
+        <pre><code>&lt;?php
+class Database {
+    private $host = "localhost";
+    private $dbname = "meu_banco";
+    private $username = "root";
+    private $password = "";
+    private $pdo;
+
+    public function connect() {
+        try {
+            $this->pdo = new PDO(
+                "mysql:host={$this->host};dbname={$this->dbname}",
+                $this->username,
+                $this->password
+            );
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            echo "Erro na conexão: " . $e->getMessage();
+        }
+        return $this->pdo;
+    }
+
+    // CREATE - Inserir dados
+    public function create($nome, $email) {
+        $sql = "INSERT INTO usuarios (nome, email) VALUES (:nome, :email)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':nome', $nome);
+        $stmt->bindParam(':email', $email);
+        return $stmt->execute();
+    }
+
+    // READ - Ler dados
+    public function read($id = null) {
+        if ($id) {
+            $sql = "SELECT * FROM usuarios WHERE id = :id";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } else {
+            $sql = "SELECT * FROM usuarios";
+            $stmt = $this->pdo->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    }
+
+    // UPDATE - Atualizar dados
+    public function update($id, $nome, $email) {
+        $sql = "UPDATE usuarios SET nome = :nome, email = :email WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':nome', $nome);
+        $stmt->bindParam(':email', $email);
+        return $stmt->execute();
+    }
+
+    // DELETE - Excluir dados
+    public function delete($id) {
+        $sql = "DELETE FROM usuarios WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
+    }
+}
+
+// Exemplo de uso
+$db = new Database();
+$db->connect();
+
+// Inserir
+$db->create("João", "joao@email.com");
+
+// Ler todos os registros
+$usuarios = $db->read();
+foreach ($usuarios as $usuario) {
+    echo "Nome: " . $usuario['nome'] . " - Email: " . $usuario['email'] . "&lt;br&gt;";
+}
+
+// Ler um registro específico
+$usuario = $db->read(1);
+echo "Nome: " . $usuario['nome'] . "&lt;br&gt;";
+
+// Atualizar
+$db->update(1, "João Silva", "joaosilva@email.com");
+
+// Excluir
+$db->delete(1);
+?&gt;</code></pre>
+
+        <h2>Explicação do Código</h2>
+        <ol>
+            <li><strong>Conexão:</strong> O método <code>connect()</code> é chamado para estabelecer a conexão com o banco de dados.</li>
+            <li><strong>Prepared Statements:</strong> Usamos <code>prepare()</code> e <code>bindParam()</code> para criar consultas seguras contra SQL Injection.</li>
+            <li><strong>Métodos CRUD:</strong>
+                <ul>
+                    <li><code>create()</code>: Insere um novo registro.</li>
+                    <li><code>read()</code>: Lê todos os registros ou um específico baseado no ID.</li>
+                    <li><code>update()</code>: Atualiza um registro existente.</li>
+                    <li><code>delete()</code>: Remove um registro pelo ID.</li>
+                </ul>
+            </li>
+            <li><strong>Retorno de Dados:</strong> Usamos <code>fetch()</code> para um único registro e <code>fetchAll()</code> para múltiplos registros, ambos com <code>PDO::FETCH_ASSOC</code> para retornar arrays associativos.</li>
+        </ol>
+
+        <h2>Configurações Adicionais do PDO</h2>
+        <p>Você pode personalizar o comportamento do PDO com atributos. Aqui estão alguns exemplos úteis:</p>
+        <pre><code>// Definir o modo de erro como exceções
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+// Desativar emulação de prepared statements (recomendado para MySQL)
+$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+
+// Definir o conjunto de caracteres
+$pdo->exec("SET NAMES utf8");
+</code></pre>
+
+        <h2>Conclusão</h2>
+        <p>O PDO é uma ferramenta poderosa para trabalhar com bancos de dados em PHP, especialmente em um contexto orientado a objetos. Ele promove segurança, portabilidade e facilidade de manutenção no código. Com a estrutura apresentada, você pode criar uma camada de abstração reutilizável para suas aplicações PHP.</p>
+        <p>Se precisar de mais exemplos ou quiser que eu adapte o código para um cenário específico, é só pedir!</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+Lista de 10 Exercícios sobre Programação Orientada a Objetos em PHP
+
+1. Classe Pessoa
+Crie uma classe chamada Pessoa com os atributos nome, idade e email. Adicione métodos para definir (set) e obter (get) esses atributos. Instancie um objeto da classe e exiba as informações.
+
+2. Calculadora Simples
+Crie uma classe Calculadora com métodos para realizar as operações básicas: somar, subtrair, multiplicar e dividir. Cada método deve receber dois números como parâmetros e retornar o resultado.
+
+3. Herança: Animal
+Crie uma classe abstrata Animal com um método abstrato emitirSom(). Crie duas classes filhas, Cachorro e Gato, que implementem o método emitirSom() retornando "Latido" e "Miado", respectivamente. Teste os objetos.
+
+4. Encapsulamento: Conta Bancária
+Crie uma classe ContaBancaria com os atributos privados saldo, titular e numeroConta. Adicione métodos públicos para depositar, sacar (com validação de saldo) e consultarSaldo. Teste as operações.
+
+5. Polimorfismo: Formas Geométricas
+Crie uma classe abstrata Forma com um método abstrato calcularArea(). Crie as classes Circulo (com atributo raio) e Retangulo (com atributos largura e altura) que herdam de Forma e implementam o método calcularArea(). Teste com diferentes objetos.
+
+6. Classe Produto
+Crie uma classe Produto com os atributos nome, preco e quantidadeEstoque. Adicione um método adicionarEstoque para aumentar a quantidade e um método vender que diminua o estoque (com validação de estoque suficiente). Exiba uma mensagem com o estoque restante após a venda.
+
+7. Relacionamento entre Classes: Pedido
+Crie uma classe Item com os atributos nome e preco. Crie uma classe Pedido que contenha um array de objetos da classe Item. Adicione um método calcularTotal na classe Pedido que soma os preços dos itens. Teste criando um pedido com vários itens.
+
+8. Interface: Veículo
+Crie uma interface Veiculo com os métodos acelerar() e frear(). Crie duas classes, Carro e Moto, que implementem essa interface. Cada classe deve exibir uma mensagem personalizada ao acelerar ou frear.
+
+9. Classe Estudante
+Crie uma classe Estudante com os atributos nome, matricula e um array de notas. Adicione um método calcularMedia que retorna a média das notas e um método situacao que retorna "Aprovado" (média ≥ 7) ou "Reprovado". Teste com diferentes estudantes.
+
+10. Composição: Biblioteca
+Crie uma classe Livro com os atributos titulo e autor. Crie uma classe Biblioteca que tenha um array de objetos da classe Livro. Adicione métodos na classe Biblioteca para adicionarLivro e listarLivros. Teste adicionando alguns livros e exibindo a lista.
+
+Dicas para Resolução:
+- Use propriedades públicas, privadas ou protegidas conforme o contexto.
+- Aplique os pilares da POO (encapsulamento, herança, polimorfismo e abstração) onde for apropriado.
+- Teste cada exercício criando instâncias e chamando os métodos no código.

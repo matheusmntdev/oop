@@ -1,0 +1,37 @@
+Exercícios de Orientação a Objetos com PHP e MySQL para Iniciantes
+
+1. Classe Usuário com Cadastro Simples
+Descrição: Crie uma classe `Usuario` com as propriedades `nome`, `email`, `username` e `senha`. Faça um método `cadastrar()` que salva esses dados na tabela `usuarios` do banco MySQL usando PDO.
+Objetivo: Aprender a criar uma classe e salvar dados no banco.
+
+2. Mostrar Tarefas de um Usuário
+Descrição: Crie uma classe `Tarefa` com propriedades como `id`, `descricao` e `usuario_id`. Adicione um método `listarPorUsuario($usuarioId)` que busca e retorna todas as tarefas de um usuário no banco.
+Objetivo: Fazer uma consulta simples ao banco e mostrar resultados.
+
+3. Checar se o Email Já Existe
+Descrição: Na classe `Usuario`, crie um método `checarEmail($email)` que olha no banco se o email já está cadastrado. Se estiver, mostre uma mensagem de erro simples.
+Objetivo: Aprender a fazer uma verificação básica no banco.
+
+4. Classe Base para Regras Comuns
+Descrição: Crie uma classe `Base` com propriedades `id` e `criado_em`, e um método vazio `salvar()`. Faça a classe `Usuario` usar essa classe `Base` para herdar essas propriedades.
+Objetivo: Entender como uma classe pode herdar de outra.
+
+5. Tarefa com Status e Prioridade
+Descrição: Na classe `Tarefa`, adicione propriedades `status` e `prioridade` (como objetos ou arrays). Crie um método `pegarDetalhes()` que busca o nome do status e da prioridade no banco.
+Objetivo: Conectar informações de tabelas diferentes.
+
+6. Mudar o Status de uma Tarefa
+Descrição: Na classe `Tarefa`, crie um método `mudarStatus($novoStatusId)` que atualiza o `status_id` de uma tarefa no banco.
+Objetivo: Aprender a atualizar dados no banco.
+
+7. Login de Usuário
+Descrição: Na classe `Usuario`, faça um método `login($email, $senha)` que verifica se o email e a senha estão certos no banco. Retorne `true` se der certo, ou `false` se falhar.
+Objetivo: Fazer um sistema de login simples.
+
+8. Apagar uma Tarefa Concluída
+Descrição: Na classe `Tarefa`, crie um método `apagar()` que só deixa excluir a tarefa se o `status_id` for 3 (exemplo para "Concluído"). Se não for, mostre uma mensagem de erro.
+Objetivo: Usar condições para controlar ações no banco.
+
+9. Modelo para Salvar e Buscar
+Descrição: Crie uma interface `Repositorio` com métodos `salvar($pdo, $objeto)` e `buscar($pdo, $id)`. Faça uma classe `UsuarioRepositorio` que usa essa interface para salvar e buscar usuários.
+Objetivo: Aprender a usar interfaces para organizar o código.

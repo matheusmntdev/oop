@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDO em PHP Orientado a Objetos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        p, li {
+            color: #555;
+        }
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDO em PHP Orientado a Objetos</h1>
+
+        <h2>O que é PDO em PHP?</h2>
+        <p>PDO é uma extensão do PHP que fornece uma interface leve e consistente para acesso a bancos de dados. Ele é orientado a objetos e suporta diversos tipos de bancos de dados (MySQL, PostgreSQL, SQLite, Oracle, etc.) usando os mesmos métodos, o que torna o código mais portável e reutilizável.</p>
+        <p>Diferente de extensões como <code>mysqli</code> ou a antiga <code>mysql</code>, o PDO oferece uma camada de abstração que facilita a troca de banco de dados sem grandes mudanças no código, além de suporte nativo a consultas preparadas (prepared statements), que ajudam a prevenir injeções SQL.</p>
+
+        <h2>Vantagens do PDO</h2>
+        <ul>
+            <li><strong>Portabilidade:</strong> Funciona com vários bancos de dados usando a mesma API.</li>
+            <li><strong>Segurança:</strong> Suporte a prepared statements para evitar SQL Injection.</li>
+            <li><strong>Flexibilidade:</strong> Pode lidar com diferentes tipos de consultas e retornos (arrays associativos, objetos, etc.).</li>
+            <li><strong>Tratamento de erros:</strong> Oferece modos de exceção para capturar erros de forma robusta.</li>
+            <li><strong>Orientação a objetos:</strong> Métodos e propriedades bem estruturados.</li>
+        </ul>
+
+        <h2>Conexão com o Banco de Dados</h2>
+        <p>Antes de realizar consultas, é necessário estabelecer uma conexão com o banco de dados. Aqui está um exemplo básico:</p>
+        <pre><code><?php
+class Database {
+    private $pdo;
+
+    public function connect() {
+        try {
+            $this->pdo = new PDO(
+                "mysql:host=localhost;dbname=meu_banco;charset=utf8",
+                "root",
+                "",
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+            );
+            return $this->pdo;
+        } catch (PDOException $e) {
+            echo "Erro na conexão: " . $e->getMessage();
+            return null;
+        }
+    }
+}
+
+$db = new Database();
+$pdo = $db->connect();
+?></code></pre>
+        <p>Neste exemplo:</p>
+        <ul>
+            <li>Usamos <code>charset=utf8</code> para suporte a caracteres especiais.</li>
+            <li>Definimos <code>PDO::ATTR_ERRMODE</code> como <code>PDO::ERRMODE_EXCEPTION</code> para tratamento de erros via exceções.</li>
+        </ul>
+
+        <h2>Consultas com PDO (CRUD Inicial)</h2>
+        <p>Um exemplo inicial de operações CRUD (Create, Read, Update, Delete) usando PDO em uma classe:</p>
+        <pre><code><?php
+class Database {
+    private $host = "localhost";
+    private $dbname = "meu_banco";
+    private $username = "root";
+    private $password = "";
+    private $pdo;
+
+    public function connect() {
+        try {
+            $this->pdo = new PDO(
+                "mysql:host={$this->host};dbname={$this->dbname}",
+                $this->username,
+                $this->password
+            );
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            echo "Erro na conexão: " . $e->getMessage();
+        }
+        return $this->pdo;
+    }
+
+    public function create($nome, $email) {
+        $sql = "INSERT INTO usuarios (nome, email) VALUES (:nome, :email)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':nome', $nome);
+        $stmt->bindParam(':email', $email);
+        return $stmt->execute();
+    }
+
+    public function read($id = null) {
+        if ($id) {
+            $sql = "SELECT * FROM usuarios WHERE id = :id";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } else {
+            $sql = "SELECT * FROM usuarios";
+            $stmt = $this->pdo->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    }
+
+    public function update($id, $nome, $email) {
+        $sql = "UPDATE usuarios SET nome = :nome, email = :email WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':nome', $nome);
+        $stmt->bindParam(':email', $email);
+        return $stmt->execute();
+    }
+
+    public function delete($id) {
+        $sql = "DELETE FROM usuarios WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
+    }
+}
+
+// Exemplo de uso
+$db = new Database();
+$db->connect();
+$db->create("João", "joao@email.com");
+$usuarios = $db->read();
+foreach ($usuarios as $usuario) {
+    echo "Nome: " . $usuario['nome'] . " - Email: " . $usuario['email'] . "<br>";
+}
+?></code></pre>
+
+        <h2>Formas de Passar Parâmetros para Consultas</h2>
+        <p>O PDO suporta duas formas principais de passar parâmetros em consultas preparadas: <strong>placeholders nomeados</strong> (com <code>:</code>) e <strong>placeholders de interrogação</strong> (<code>?</code>).</p>
+
+        <h3>1. Placeholders Nomeados (:nome)</h3>
+        <p>Usamos <code>:</code> seguido de um nome para cada parâmetro. Os valores podem ser vinculados com <code>bindParam()</code> ou passados diretamente no <code>execute()</code>.</p>
+        <pre><code><?php
+public function create($nome, $email) {
+    try {
+        $sql = "INSERT INTO usuarios (nome, email) VALUES (:nome, :email)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':nome' => $nome, ':email' => $email]);
+        echo "Usuário inserido com sucesso!";
+    } catch (PDOException $e) {
+        echo "Erro ao inserir: " . $e->getMessage();
+    }
+}
+?></code></pre>
+        <p><strong>Alternativa com bindParam:</strong></p>
+        <pre><code>$stmt->bindParam(':nome', $nome);
+$stmt->bindParam(':email', $email);
+$stmt->execute();</code></pre>
+
+        <h3>2. Placeholders de Interrogação (?)</h3>
+        <p>Usamos <code>?</code> como marcadores de posição, e os valores são associados na ordem em que aparecem.</p>
+        <pre><code><?php
+public function update($id, $nome, $email) {
+    try {
+        $sql = "UPDATE usuarios SET nome = ?, email = ? WHERE id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$nome, $email, $id]);
+        echo "Usuário atualizado com sucesso!";
+    } catch (PDOException $e) {
+        echo "Erro ao atualizar: " . $e->getMessage();
+    }
+}
+?></code></pre>
+        <p><strong>Diferenças:</strong> Os nomeados são mais legíveis para consultas complexas, enquanto os de interrogação são mais simples para consultas curtas.</p>
+
+        <h2>Buscando Dados com PDO</h2>
+        <p>O PDO oferece métodos como <code>fetch()</code>, <code>fetchAll()</code> e <code>fetchObject()</code> para recuperar dados.</p>
+
+        <h3>1. fetch() - Buscar um único registro</h3>
+        <pre><code><?php
+public function readById($id) {
+    try {
+        $sql = "SELECT * FROM usuarios WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        echo "Erro ao buscar: " . $e->getMessage();
+        return false;
+    }
+}
+
+// Uso
+$usuario = $db->readById(1);
+if ($usuario) {
+    echo "Nome: " . $usuario['nome'] . " - Email: " . $usuario['email'];
+}
+?></code></pre>
+
+        <h3>2. fetchAll() - Buscar todos os registros</h3>
+        <pre><code><?php
+public function readAll() {
+    try {
+        $sql = "SELECT * FROM usuarios";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        echo "Erro ao buscar: " . $e->getMessage();
+        return [];
+    }
+}
+
+// Uso
+$usuarios = $db->readAll();
+foreach ($usuarios as $usuario) {
+    echo "Nome: " . $usuario['nome'] . " - Email: " . $usuario['email'] . "<br>";
+}
+?></code></pre>
+
+        <h3>3. fetchObject() - Buscar como objeto</h3>
+        <pre><code><?php
+class Usuario {
+    public $id;
+    public $nome;
+    public $email;
+}
+
+public function readAsObject($id) {
+    try {
+        $sql = "SELECT * FROM usuarios WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetchObject('Usuario');
+    } catch (PDOException $e) {
+        echo "Erro ao buscar: " . $e->getMessage();
+        return null;
+    }
+}
+
+// Uso
+$usuario = $db->readAsObject(1);
+if ($usuario) {
+    echo "Nome: " . $usuario->nome . " - Email: " . $usuario->email;
+}
+?></code></pre>
+        <p><strong>Opções de FETCH:</strong> <code>PDO::FETCH_ASSOC</code> (array associativo), <code>PDO::FETCH_NUM</code> (array numérico), <code>PDO::FETCH_OBJ</code> (objeto genérico), <code>PDO::FETCH_CLASS</code> (objeto de classe).</p>
+
+        <h2>Outras Funcionalidades Úteis</h2>
+
+        <h3>1. Contar Linhas Afetadas</h3>
+        <pre><code><?php
+public function delete($id) {
+    try {
+        $sql = "DELETE FROM usuarios WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $linhas = $stmt->rowCount();
+        echo "$linhas usuário(s) excluído(s)!";
+    } catch (PDOException $e) {
+        echo "Erro ao excluir: " . $e->getMessage();
+    }
+}
+?></code></pre>
+
+        <h3>2. Último ID Inserido</h3>
+        <pre><code><?php
+public function create($nome, $email) {
+    try {
+        $sql = "INSERT INTO usuarios (nome, email) VALUES (:nome, :email)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':nome' => $nome, ':email' => $email]);
+        $id = $this->pdo->lastInsertId();
+        echo "Usuário inserido com ID: $id";
+    } catch (PDOException $e) {
+        echo "Erro ao inserir: " . $e->getMessage();
+    }
+}
+?></code></pre>
+
+        <h3>3. Consultas Simples (Sem Prepared Statements)</h3>
+        <pre><code><?php
+public function getTotalUsers() {
+    try {
+        $stmt = $this->pdo->query("SELECT COUNT(*) as total FROM usuarios");
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'];
+    } catch (PDOException $e) {
+        echo "Erro ao contar: " . $e->getMessage();
+        return 0;
+    }
+}
+
+// Uso
+$total = $db->getTotalUsers();
+echo "Total de usuários: $total";
+?></code></pre>
+
+        <h2>Transações no PDO</h2>
+        <h3>O que são Transações?</h3>
+        <p>Uma <strong>transação</strong> é um conjunto de operações no banco de dados que são executadas como uma única unidade lógica. Todas as operações devem ser concluídas com sucesso para que as alterações sejam aplicadas (<code>commit</code>). Caso contrário, se algo falhar, todas as mudanças são descartadas (<code>rollback</code>). O PDO suporta transações com os métodos <code>beginTransaction()</code>, <code>commit()</code> e <code>rollBack()</code>.</p>
+
+        <h3>Por que usar Transações?</h3>
+        <ul>
+            <li><strong>Atomicidade:</strong> Garante que todas as operações sejam concluídas ou nenhuma seja aplicada.</li>
+            <li><strong>Consistência:</strong> Mantém o banco de dados em um estado válido, mesmo em caso de falhas.</li>
+            <li><strong>Segurança:</strong> Evita que alterações parciais sejam gravadas se uma operação falhar.</li>
+            <li><strong>Desempenho:</strong> Agrupar operações em uma transação pode ser mais eficiente.</li>
+        </ul>
+
+        <h3>Exemplo Básico de Transação</h3>
+        <p>Exemplo de transferência de dinheiro entre contas:</p>
+        <pre><code><?php
+public function transferir($contaOrigemId, $contaDestinoId, $valor) {
+    try {
+        $this->pdo->beginTransaction();
+
+        $sql = "UPDATE contas SET saldo = saldo - :valor WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':valor' => $valor, ':id' => $contaOrigemId]);
+
+        $sql = "UPDATE contas SET saldo = saldo + :valor WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':valor' => $valor, ':id' => $contaDestinoId]);
+
+        $this->pdo->commit();
+        echo "Transferência realizada com sucesso!";
+    } catch (PDOException $e) {
+        $this->pdo->rollBack();
+        echo "Erro na transferência: " . $e->getMessage();
+    }
+}
+
+// Uso
+$db->transferir(1, 2, 100.00);
+?></code></pre>
+
+        <h3>Transação com Validação</h3>
+        <p>Exemplo com verificação de saldo:</p>
+        <pre><code><?php
+public function transferirComValidacao($contaOrigemId, $contaDestinoId, $valor) {
+    try {
+        $this->pdo->beginTransaction();
+
+        $sql = "SELECT saldo FROM contas WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':id' => $contaOrigemId]);
+        $saldo = $stmt->fetchColumn();
+
+        if ($saldo < $valor) {
+            throw new Exception("Saldo insuficiente na conta de origem!");
+        }
+
+        $sql = "UPDATE contas SET saldo = saldo - :valor WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':valor' => $valor, ':id' => $contaOrigemId]);
+
+        $sql = "UPDATE contas SET saldo = saldo + :valor WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':valor' => $valor, ':id' => $contaDestinoId]);
+
+        $this->pdo->commit();
+        echo "Transferência realizada com sucesso!";
+    } catch (Exception $e) {
+        $this->pdo->rollBack();
+        echo "Erro: " . $e->getMessage();
+    }
+}
+?></code></pre>
+
+        <h3>Transações com Múltiplas Tabelas</h3>
+        <p>Exemplo de registro de venda e atualização de estoque:</p>
+        <pre><code><?php
+public function registrarVenda($produtoId, $quantidade, $clienteId) {
+    try {
+        $this->pdo->beginTransaction();
+
+        $sql = "SELECT quantidade FROM produtos WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':id' => $produtoId]);
+        $estoque = $stmt->fetchColumn();
+
+        if ($estoque < $quantidade) {
+            throw new Exception("Estoque insuficiente!");
+        }
+
+        $sql = "UPDATE produtos SET quantidade = quantidade - :quantidade WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':quantidade' => $quantidade, ':id' => $produtoId]);
+
+        $sql = "INSERT INTO vendas (produto_id, cliente_id, quantidade) VALUES (:produto_id, :cliente_id, :quantidade)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':produto_id' => $produtoId,
+            ':cliente_id' => $clienteId,
+            ':quantidade' => $quantidade
+        ]);
+
+        $this->pdo->commit();
+        echo "Venda registrada com sucesso!";
+    } catch (Exception $e) {
+        $this->pdo->rollBack();
+        echo "Erro ao registrar venda: " . $e->getMessage();
+    }
+}
+?></code></pre>
+
+        <h3>Considerações sobre Transações</h3>
+        <ul>
+            <li><strong>Suporte do Banco:</strong> Funciona apenas com engines que suportam transações (ex.: InnoDB no MySQL).</li>
+            <li><strong>Erros Silenciosos:</strong> Use <code>try-catch</code> para garantir o <code>rollBack()</code> em falhas.</li>
+            <li><strong>Autocommit:</strong> Após <code>commit()</code> ou <code>rollBack()</code>, o modo autocommit é restaurado.</li>
+            <li><strong>Aninhamento:</strong> O PDO não suporta transações aninhadas nativamente; use savepoints se necessário.</li>
+        </ul>
+
+        <h2>Configurações Adicionais do PDO</h2>
+        <p>Você pode personalizar o comportamento do PDO com atributos:</p>
+        <pre><code>// Definir o modo de erro como exceções
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+// Desativar emulação de prepared statements (recomendado para MySQL)
+$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+
+// Definir o conjunto de caracteres
+$pdo->exec("SET NAMES utf8");
+</code></pre>
+
+        <h2>Classe Completa com Exemplos</h2>
+        <p>Uma versão consolidada da classe <code>Database</code> com todos os exemplos:</p>
+        <pre><code><?php
+class Database {
+    private $pdo;
+
+    public function connect() {
+        try {
+            $this->pdo = new PDO(
+                "mysql:host=localhost;dbname=meu_banco;charset=utf8",
+                "root",
+                "",
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+            );
+            return $this->pdo;
+        } catch (PDOException $e) {
+            echo "Erro na conexão: " . $e->getMessage();
+            return null;
+        }
+    }
+
+    public function create($nome, $email) {
+        try {
+            $sql = "INSERT INTO usuarios (nome, email) VALUES (:nome, :email)";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':nome' => $nome, ':email' => $email]);
+            $id = $this->pdo->lastInsertId();
+            echo "Usuário inserido com ID: $id";
+        } catch (PDOException $e) {
+            echo "Erro ao inserir: " . $e->getMessage();
+        }
+    }
+
+    public function readById($id) {
+        try {
+            $sql = "SELECT * FROM usuarios WHERE id = :id";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Erro ao buscar: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    public function readAll() {
+        try {
+            $sql = "SELECT * FROM usuarios";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Erro ao buscar: " . $e->getMessage();
+            return [];
+        }
+    }
+
+    public function update($id, $nome, $email) {
+        try {
+            $sql = "UPDATE usuarios SET nome = ?, email = ? WHERE id = ?";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$nome, $email, $id]);
+            echo "Usuário atualizado!";
+        } catch (PDOException $e) {
+            echo "Erro ao atualizar: " . $e->getMessage();
+        }
+    }
+
+    public function delete($id) {
+        try {
+            $sql = "DELETE FROM usuarios WHERE id = :id";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            $linhas = $stmt->rowCount();
+            echo "$linhas usuário(s) excluído(s)!";
+        } catch (PDOException $e) {
+            echo "Erro ao excluir: " . $e->getMessage();
+        }
+    }
+}
+
+// Uso
+$db = new Database();
+$db->connect();
+$db->create("João", "joao@email.com");
+$usuarios = $db->readAll();
+foreach ($usuarios as $u) {
+    echo "Nome: " . $u['nome'] . " - Email: " . $u['email'] . "<br>";
+}
+?></code></pre>
+
+        <h2>Conclusão</h2>
+        <p>O PDO é uma ferramenta poderosa para trabalhar com bancos de dados em PHP, especialmente em um contexto orientado a objetos. Ele promove segurança, portabilidade e flexibilidade, permitindo passar parâmetros de forma segura, buscar dados com diferentes formatos e gerenciar resultados com métodos úteis como <code>rowCount()</code> e <code>lastInsertId()</code>. As transações adicionam uma camada de integridade, garantindo que operações complexas sejam executadas de forma atômica.</p>
+        <p>Se precisar de mais exemplos ou adaptações, é só pedir!</p>
+    </div>
+</body>
+</html>

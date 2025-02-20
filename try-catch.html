@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Try-Catch no PHP</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        p, li {
+            color: #555;
+        }
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Try-Catch no PHP</h1>
+
+        <h2>O que é Try-Catch no PHP?</h2>
+        <p>O <code>try</code> e <code>catch</code> são estruturas de controle no PHP usadas para <strong>tratamento de exceções</strong>. Elas permitem que você gerencie erros de forma controlada, evitando que o script pare abruptamente ou exiba mensagens de erro indesejadas para o usuário final. Esse mecanismo é especialmente útil em programação orientada a objetos, onde exceções são lançadas por classes ou métodos para sinalizar problemas.</p>
+        <ul>
+            <li><strong><code>try</code>:</strong> Define um bloco de código que será testado em busca de erros ou exceções.</li>
+            <li><strong><code>catch</code>:</strong> Define um bloco de código que será executado se uma exceção for lançada no bloco <code>try</code>. Ele captura a exceção e permite tratá-la.</li>
+        </ul>
+        <p>O PHP suporta exceções por meio da classe padrão <code>Exception</code> e suas subclasses, como <code>PDOException</code>, que é comum ao trabalhar com bancos de dados via PDO.</p>
+
+        <h2>Por que usar Try-Catch?</h2>
+        <ul>
+            <li><strong>Prevenir falhas críticas:</strong> Em vez de o programa travar, você pode capturar o erro e decidir o que fazer (ex.: exibir uma mensagem amigável ou registrar o problema).</li>
+            <li><strong>Debugging facilitado:</strong> Exceções fornecem informações detalhadas, como mensagens de erro e rastreamento de pilha (stack trace).</li>
+            <li><strong>Controle de fluxo:</strong> Permite que o programa continue executando mesmo após um erro, se desejado.</li>
+            <li><strong>Segurança:</strong> Evita expor detalhes técnicos sensíveis ao usuário final.</li>
+        </ul>
+
+        <h2>Sintaxe Básica</h2>
+        <p>Aqui está a estrutura básica de um <code>try-catch</code> no PHP:</p>
+        <pre><code>try {
+    // Código que pode gerar uma exceção
+} catch (Exception $e) {
+    // Código para tratar a exceção
+    echo "Erro: " . $e->getMessage();
+}</code></pre>
+        <p><strong><code>$e</code>:</strong> É o objeto da exceção capturada, que contém métodos como <code>getMessage()</code> (mensagem de erro), <code>getCode()</code> (código do erro) e <code>getTrace()</code> (rastreamento da pilha).</p>
+        <p>Você pode usar tipos específicos de exceções no <code>catch</code>, como <code>PDOException</code>, para capturar erros de um contexto específico.</p>
+
+        <h2>Exemplo Simples</h2>
+        <p>Vamos criar um exemplo básico para demonstrar o funcionamento:</p>
+        <pre><code>
+try {
+    $numero = 10;
+    if ($numero > 5) {
+        throw new Exception("O número é maior que 5!");
+    }
+    echo "Tudo certo!";
+} catch (Exception $e) {
+    echo "Erro capturado: " . $e->getMessage();
+}
+</code></pre>
+        <p><strong>Saída:</strong></p>
+        <pre><code>Erro capturado: O número é maior que 5!</code></pre>
+        <p>Nesse caso:</p>
+        <ul>
+            <li>O bloco <code>try</code> verifica uma condição e lança (<code>throw</code>) uma exceção se ela for verdadeira.</li>
+            <li>O <code>catch</code> captura a exceção e exibe a mensagem.</li>
+        </ul>
+
+        <h2>Try-Catch com PDO</h2>
+        <p>Como o PDO é um exemplo comum de uso de exceções, vamos ver como o <code>try-catch</code> é aplicado em uma conexão com banco de dados:</p>
+        <pre><code>
+try {
+    $pdo = new PDO(
+        "mysql:host=localhost;dbname=meu_banco",
+        "root",
+        ""
+    );
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    echo "Conexão bem-sucedida!";
+} catch (PDOException $e) {
+    echo "Erro na conexão: " . $e->getMessage();
+}
+</code></pre>
+        <p><strong>Possíveis saídas:</strong></p>
+        <ul>
+            <li>Se a conexão funcionar: <code>Conexão bem-sucedida!</code></li>
+            <li>Se falhar (ex.: banco de dados inexistente): <code>Erro na conexão: SQLSTATE[HY000] [1049] Unknown database 'meu_banco'</code></li>
+        </ul>
+        <p>Aqui, o <code>catch</code> captura especificamente uma <code>PDOException</code>, que é lançada pelo PDO em caso de falhas, como credenciais inválidas ou servidor indisponível.</p>
+
+        <h2>Múltiplos Catchs</h2>
+        <p>Você pode usar vários blocos <code>catch</code> para tratar diferentes tipos de exceções:</p>
+        <pre><code>
+try {
+    $pdo = new PDO("mysql:host=localhost;dbname=nao_existe", "root", "");
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo "Erro de banco de dados: " . $e->getMessage();
+} catch (Exception $e) {
+    echo "Erro genérico: " . $e->getMessage();
+}
+</code></pre>
+        <ul>
+            <li>O primeiro <code>catch</code> trata erros específicos do PDO.</li>
+            <li>O segundo <code>catch</code> captura exceções genéricas, funcionando como um "fallback".</li>
+        </ul>
+
+        <h2>Bloco Finally (Opcional)</h2>
+        <p>Desde o PHP 5.5, existe o bloco <code>finally</code>, que é executado <strong>sempre</strong>, independentemente de uma exceção ser lançada ou não:</p>
+        <pre><code>
+try {
+    $numero = 0;
+    if ($numero == 0) {
+        throw new Exception("Divisão por zero!");
+    }
+    echo 10 / $numero;
+} catch (Exception $e) {
+    echo "Erro: " . $e->getMessage();
+} finally {
+    echo "<br>Este código sempre será executado.";
+}
+</code></pre>
+        <p><strong>Saída:</strong></p>
+        <pre><code>Erro: Divisão por zero!
+Este código sempre será executado.</code></pre>
+        <p>O <code>finally</code> é útil para liberar recursos (ex.: fechar conexões ou arquivos) independentemente do resultado do <code>try</code>.</p>
+
+        <h2>Integração com Classes</h2>
+        <p>Aqui está um exemplo integrando <code>try-catch</code> em uma classe orientada a objetos, como no caso do PDO:</p>
+        <pre><code>
+class Database {
+    private $pdo;
+
+    public function connect() {
+        try {
+            $this->pdo = new PDO(
+                "mysql:host=localhost;dbname=meu_banco",
+                "root",
+                ""
+            );
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            return $this->pdo;
+        } catch (PDOException $e) {
+            throw new Exception("Falha na conexão: " . $e->getMessage());
+        }
+    }
+
+    public function getData() {
+        try {
+            $stmt = $this->pdo->query("SELECT * FROM usuarios");
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Erro na consulta: " . $e->getMessage();
+            return false;
+        }
+    }
+}
+
+// Uso da classe
+$db = new Database();
+
+try {
+    $db->connect();
+    $dados = $db->getData();
+    if ($dados) {
+        foreach ($dados as $linha) {
+            echo $linha['nome'] . "<br>";
+        }
+    }
+} catch (Exception $e) {
+    echo $e->getMessage();
+}
+</code></pre>
+        <p>Nesse exemplo:</p>
+        <ul>
+            <li>O método <code>connect()</code> lança uma exceção personalizada se a conexão falhar.</li>
+            <li>O método <code>getData()</code> trata erros internamente, mas retorna <code>false</code> em caso de falha.</li>
+            <li>O código externo usa outro <code>try-catch</code> para gerenciar erros gerais.</li>
+        </ul>
+
+        <h2>Conclusão</h2>
+        <p>O <code>try-catch</code> no PHP é uma ferramenta essencial para lidar com exceções de forma robusta e segura. Ele é amplamente utilizado em bibliotecas como o PDO e em aplicações orientadas a objetos, permitindo que você:</p>
+        <ul>
+            <li>Capture e trate erros específicos.</li>
+            <li>Mantenha o controle do fluxo do programa.</li>
+            <li>Melhore a experiência do usuário ao ocultar detalhes técnicos.</li>
+        </ul>
+        <p>Se precisar de mais exemplos ou quiser explorar algum caso específico (como personalizar exceções ou usar com outros cenários), é só pedir!</p>
+    </div>
+</body>
+</html>
